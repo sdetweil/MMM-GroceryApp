@@ -1,14 +1,17 @@
 const NodeHelper = require("node_helper");
-var request = require("request");
+const request = require("request");
+const base64 = require('base-64');
+const { ClientCredentials, ResourceOwnerPassword, AuthorizationCode } = require('simple-oauth2');
 
 module.exports = NodeHelper.create({
 	start() {
 		console.log("Starting node helper for: " + this.name);
 	},
-
+accessToken: null,
+baseUrl:"https://api-ce.kroger.com/v1/",
 getToken(config) {
 	try {
-		const token = getTokenInternal(config);
+		const token = this.getTokenInternal(config);
 		console.log("returning token="+token)
 		return token;
     } catch (err) {
@@ -34,12 +37,12 @@ getTokenInternal(config) {
 		}
 	};
 
-	const oauth2 = require("Basic").create(credentials);
+	//const oauth2 = require("basic")(credentials);
 
 		const tokenConfig = {
-			grant_type: config.client_credentials,
-			client_secret: config.client_secret,
-			client_id: config.client_id
+			grant_type: "code",
+			secret: config.client_secret,
+			id: config.client_id
 		};
 
 		try {
@@ -117,26 +120,26 @@ getData: function() {
 			}}
 		);
 	}
-		if (accessToken === null ) {
-				var tempToken = getToken(this.config);
-				var localToken = tempToken.then(function(accessToken){
-					consol.log("returning accessToken")
-					return accessToken;
-				});
+		if (this.accessToken === null ) {
+			var tempToken = this.getToken(this.config);
+			var localToken = tempToken.then(function(accessToken){
+				console.log("returning accessToken")
+				return accessToken;
+			});
 
-				localToken.then(function(token) {
-					accessToken = token;
-					getCartData(token);
-					getProductSearch(token);
-					getProductDetails(token);
-					getLocationData(token);
+			localToken.then(function(token) {
+				this.accessToken = token;
+				this.getCartData(token);
+				this.getProductSearch(token);
+				this.getProductDetails(token);
+				this.getLocationData(token);
 			});
 		}
 		else {
-			getCartData(accessToken);
-			getProductSearch(accessToken);
-			getProductDetails(accessToken);
-			getLocationData(token);
+			getCartData(this.accessToken);
+			getProductSearch(this.ccessToken);
+			getProductDetails(this.accessToken);
+			getLocationData(this.token);
 		}
 	},
 
@@ -144,8 +147,8 @@ getData: function() {
 			let self = this
 		if (notification === "CONFIG") {
 			self.config = payload;
-			this.sendSocketNotification("MMM-GroceryApp");
-			self.sendSocketNotification("STARTED", true);
+			//this.sendSocketNotification("MMM-GroceryApp");
+			//self.sendSocketNotification("STARTED", true);
 			self.getData();
 			self.started = true;
 		} else if (notification == "UPDATE") {

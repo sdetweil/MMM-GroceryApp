@@ -80,7 +80,7 @@ Module.register("MMM-GroceryApp", {
 		wrapper.style.cssText = "float: right;";
 
 		// Data from helper
-		if (this.dataNotification) {
+		if (this.loaded) {
 			var wrapperDataNotification = document.createElement("div");
 			// translations  + datanotification
 			wrapperDataNotification.innerHTML =  this.translate("UPDATE") + ": " + this.dataNotification.date;

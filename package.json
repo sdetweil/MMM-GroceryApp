@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "request": "^2.88.2"
+    "base-64": "^1.0.0",
+    "request": "^2.88.2",
+    "simple-oauth2": "^4.3.0"
   }
 }
